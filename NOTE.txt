@@ -1,0 +1,35 @@
+📂 Cấu trúc thư mục
+express-management/
+│── src/
+│   │── config/
+│   │   │── db.js               # Kết nối MongoDB
+│   │── controllers/
+│   │   │── authController.js    # Đăng ký, đăng nhập
+│   │   │── userController.js    # Quản lý user
+│   │   │── classController.js   # Quản lý lớp học
+│   │   │── assignmentController.js # Quản lý bài tập lớn
+│   │   │── submissionController.js # Quản lý nộp bài
+│   │   │── chatController.js       # Chat và thông báo
+│   │── models/
+│   │   │── User.js           # Model User (User & Admin)
+│   │   │── Class.js          # Model Class
+│   │   │── Assignment.js     # Model Assignment
+│   │   │── Submission.js     # Model Submission
+│   │   │── Message.js        # Model Message
+│   │── routes/
+│   │   │── authRoutes.js     # Route auth
+│   │   │── classRoutes.js    # Route class
+│   │   │── assignmentRoutes.js # Route bài tập
+│   │   │── submissionRoutes.js # Route nộp bài
+│   │   │── chatRoutes.js     # Route chat
+│   │── middleware/
+│   │   │── authMiddleware.js # Middleware xác thực JWT
+│   │── utils/
+│   │   │── fileUpload.js    # Xử lý upload file
+│   │   │── emailService.js  # Gửi email thông báo
+│   │── app.js               # Cấu hình Express
+│   │── server.js            # Khởi chạy server
+│── .env                     # Biến môi trường
+│── .gitignore                # File ignore khi push lên Git
+│── package.json              # Dependencies của dự án
+│── README.md                 # Hướng dẫn sử dụng
