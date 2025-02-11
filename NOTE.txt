@@ -33,3 +33,70 @@ express-management/
 │── .gitignore                # File ignore khi push lên Git
 │── package.json              # Dependencies của dự án
 │── README.md                 # Hướng dẫn sử dụng
+
+classRoutes.js:
+
+
+Bảo vệ tất cả routes với middleware protect
+CRUD cơ bản cho lớp học (create, read, update, delete)
+Routes quản lý học sinh trong lớp (thêm/xóa)
+Các endpoints:
+
+POST / - Tạo lớp mới
+GET / - Lấy danh sách lớp
+GET /:id - Chi tiết lớp
+PUT /:id - Cập nhật lớp
+DELETE /:id - Xóa lớp
+POST /:id/students/add - Thêm học sinh
+POST /:id/students/remove - Xóa học sinh
+
+
+
+
+assignmentRoutes.js:
+
+
+Bảo vệ routes với middleware protect
+Quản lý CRUD cho bài tập
+Các endpoints:
+
+POST / - Tạo bài tập mới
+GET /class/:classId - Lấy bài tập theo lớp
+GET /:id - Chi tiết bài tập
+PUT /:id - Cập nhật bài tập
+DELETE /:id - Xóa bài tập
+
+
+
+
+submissionRoutes.js:
+
+
+Bảo vệ routes với middleware protect
+Quản lý bài nộp và chấm điểm
+Các endpoints:
+
+POST / - Nộp bài
+GET /student/:assignmentId - Xem bài nộp của học sinh
+GET /assignment/:assignmentId - Xem tất cả bài nộp
+PUT /:id - Cập nhật bài nộp
+DELETE /:id - Xóa bài nộp
+POST /:id/grade - Chấm điểm
+
+
+
+
+chatRoutes.js:
+
+
+Bảo vệ routes với middleware protect
+Quản lý tin nhắn và thông báo
+Các endpoints:
+
+POST /send - Gửi tin nhắn
+GET /conversation/:userId - Xem cuộc trò chuyện
+GET /class/:classId - Xem tin nhắn lớp
+POST /announcement - Tạo thông báo
+GET /announcements/:classId - Xem thông báo lớp
+PUT /:id/read - Đánh dấu đã đọc
+DELETE /:id - Xóa tin nhắn

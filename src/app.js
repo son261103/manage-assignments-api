@@ -2,7 +2,12 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const mongoose = require('./config/dbConfig');
-const authRoutes = require('./routes/authRoutes');  // Đảm bảo đã có file này
+const authRoutes = require('./routes/authRoutes'); 
+const authRoutes = require('./routes/authRoutes');
+const classRoutes = require('./routes/classRoutes');
+const assignmentRoutes = require('./routes/assignmentRoutes');
+const submissionRoutes = require('./routes/submissionRoutes');
+const chatRoutes = require('./routes/chatRoutes');
 
 
 dotenv.config(); // Load biến môi trường từ .env
@@ -15,7 +20,10 @@ app.use(express.json());
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
-
+app.use('/api/v1/classes', classRoutes);
+app.use('/api/v1/assignments', assignmentRoutes);
+app.use('/api/v1/submissions', submissionRoutes);
+app.use('/api/v1/messages', chatRoutes);
 // Route mặc định
 app.get('/', (req, res) => {
     res.send('Welcome to the Assignment Management API');
