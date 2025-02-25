@@ -14,7 +14,7 @@ router.use(protect);
 
 // Routes CRUD cho bài tập
 router.post('/', createAssignment);                // Tạo bài tập mới
-router.get('/class/:classId', getClassAssignments); // Lấy danh sách bài tập của lớp
+router.get('/classes/:classId/assignments', getClassAssignments); // Sửa route cho đồng bộ với frontend
 
 router.route('/:id')
     .get(getAssignmentById)    // Lấy chi tiết bài tập

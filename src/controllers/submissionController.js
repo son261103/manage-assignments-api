@@ -5,61 +5,55 @@ const Class = require('../models/Class');
 // Create submission
 const createSubmission = async (req, res) => {
     try {
-        const { assignmentId, content, attachments } = req.body;
-        const assignment = await Assignment.findById(assignmentId);
-
-        if (!assignment) {
-            return res.status(404).json({ msg: 'Assignment not found' });
-        }
-
-        // Check if student is in class
-        const class_ = await Class.findById(assignment.class);
-        if (!class_.students.includes(req.user.id)) {
-            return res.status(403).json({ msg: 'Not authorized - You are not in this class' });
-        }
-
-        // Check if submission already exists
-        let submission = await Submission.findOne({
-            assignment: assignmentId,
-            student: req.user.id
-        });
-
-        if (submission) {
-            // Update existing submission
-            submission.content = content;
-            submission.attachments = attachments;
-            submission.status = new Date() > new Date(assignment.dueDate) ? 'late' : 'submitted';
-            await submission.save();
-            return res.json({ 
-                msg: 'Submission updated successfully', 
-                data: submission 
-            });
-        }
-
-        // Create new submission
-        submission = new Submission({
-            student: req.user.id,
-            assignment: assignmentId,
-            content,
-            attachments,
-            status: new Date() > new Date(assignment.dueDate) ? 'late' : 'submitted'
-        });
-
+      const { assignmentId, content, attachments, studentId, grade, feedback } = req.body;
+      const assignment = await Assignment.findById(assignmentId);
+  
+      if (!assignment) {
+        return res.status(404).json({ msg: 'Assignment not found' });
+      }
+  
+      const class_ = await Class.findById(assignment.class);
+      const submittingStudentId = studentId || req.user.id;
+      if (!class_.students.includes(submittingStudentId) && !req.user.isAdmin) {
+        return res.status(403).json({ msg: 'Not authorized - You are not in this class' });
+      }
+  
+      let submission = await Submission.findOne({
+        assignment: assignmentId,
+        student: submittingStudentId
+      });
+  
+      if (submission) {
+        submission.content = content || submission.content;
+        submission.attachments = attachments || submission.attachments;
+        submission.grade = grade || submission.grade;
+        submission.feedback = feedback || submission.feedback;
+        submission.status = grade ? 'graded' : (new Date() > new Date(assignment.dueDate) ? 'late' : 'submitted');
         await submission.save();
-
-        // Add submission to assignment
-        assignment.submissions.push(submission._id);
-        await assignment.save();
-
-        res.status(201).json({ 
-            msg: 'Submission created successfully', 
-            data: submission 
-        });
+        return res.json({ msg: 'Submission updated successfully', data: submission });
+      }
+  
+      submission = new Submission({
+        student: submittingStudentId,
+        assignment: assignmentId,
+        content,
+        attachments,
+        grade,
+        feedback,
+        status: grade ? 'graded' : (new Date() > new Date(assignment.dueDate) ? 'late' : 'submitted')
+      });
+  
+      await submission.save();
+  
+      assignment.submissions.push(submission._id);
+      await assignment.save();
+  
+      res.status(201).json({ msg: 'Submission created successfully', data: submission });
     } catch (err) {
-        console.error(err);
-        res.status(500).json({ msg: 'Server error' });
+      console.error(err);
+      res.status(500).json({ msg: 'Server error' });
     }
-};
+  };
 
 // Get student's submission for an assignment
 const getStudentSubmission = async (req, res) => {
@@ -88,7 +82,6 @@ const getAssignmentSubmissions = async (req, res) => {
             return res.status(404).json({ msg: 'Assignment not found' });
         }
 
-        // Verify teacher permission
         const class_ = await Class.findById(assignment.class);
         if (class_.teacher.toString() !== req.user.id && !req.user.isAdmin) {
             return res.status(403).json({ msg: 'Not authorized - Teachers only' });
@@ -117,12 +110,10 @@ const updateSubmission = async (req, res) => {
             return res.status(404).json({ msg: 'Submission not found' });
         }
 
-        // Verify student ownership
         if (submission.student.toString() !== req.user.id) {
             return res.status(403).json({ msg: 'Not authorized - Not your submission' });
         }
 
-        // Check if assignment is still open
         const assignment = await Assignment.findById(submission.assignment);
         if (new Date() > new Date(assignment.dueDate)) {
             submission.status = 'late';
@@ -152,13 +143,11 @@ const gradeSubmission = async (req, res) => {
             return res.status(404).json({ msg: 'Submission not found' });
         }
 
-        // Verify teacher permission
         const class_ = await Class.findById(submission.assignment.class);
         if (class_.teacher.toString() !== req.user.id && !req.user.isAdmin) {
             return res.status(403).json({ msg: 'Not authorized - Teachers only' });
         }
 
-        // Validate grade
         if (grade < 0 || grade > submission.assignment.points) {
             return res.status(400).json({ 
                 msg: `Grade must be between 0 and ${submission.assignment.points}` 
@@ -186,19 +175,17 @@ const deleteSubmission = async (req, res) => {
             return res.status(404).json({ msg: 'Submission not found' });
         }
 
-        // Only allow deletion by submission owner or admin
         if (submission.student.toString() !== req.user.id && !req.user.isAdmin) {
             return res.status(403).json({ msg: 'Not authorized' });
         }
 
-        // Remove submission reference from assignment
         const assignment = await Assignment.findById(submission.assignment);
         assignment.submissions = assignment.submissions.filter(
             sub => sub.toString() !== submission._id.toString()
         );
         await assignment.save();
 
-        await submission.remove();
+        await Submission.findByIdAndDelete(req.params.id); // Sửa từ .remove()
         res.json({ msg: 'Submission deleted successfully' });
     } catch (err) {
         console.error(err);

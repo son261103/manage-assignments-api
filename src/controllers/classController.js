@@ -103,7 +103,7 @@ const deleteClass = async (req, res) => {
             return res.status(403).json({ msg: 'Not authorized' });
         }
 
-        await class_.remove();
+        await Class.findByIdAndDelete(req.params.id); // Thay .remove() bằng .findByIdAndDelete()
         res.json({ msg: 'Class deleted successfully' });
     } catch (err) {
         console.error(err);

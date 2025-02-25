@@ -10,7 +10,7 @@ const messageSchema = new mongoose.Schema(
         recipient: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'User',
-            required: true,
+            required: false // Sửa từ true thành false
         },
         class: {
             type: mongoose.Schema.Types.ObjectId,
